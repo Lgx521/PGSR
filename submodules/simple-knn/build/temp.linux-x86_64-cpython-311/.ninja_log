@@ -1,0 +1,4 @@
+# ninja log v5
+1	6385	1757756077281510130	/home/sgan/PGSR/submodules/simple-knn/build/temp.linux-x86_64-cpython-311/simple_knn.o	43c8e1a9d7579003
+1	11153	1757756081996850277	/home/sgan/PGSR/submodules/simple-knn/build/temp.linux-x86_64-cpython-311/ext.o	d70bf9e8c3ca7f71
+1	25847	1757756096732879983	/home/sgan/PGSR/submodules/simple-knn/build/temp.linux-x86_64-cpython-311/spatial.o	554d9cb863e3681d
