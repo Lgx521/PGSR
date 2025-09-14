@@ -32,6 +32,7 @@ from scene.cameras import Camera
 try:
     from torch.utils.tensorboard import SummaryWriter
     TENSORBOARD_FOUND = True
+    print("utlizing Tensorboard")
 except ImportError:
     TENSORBOARD_FOUND = False
 import time
@@ -478,8 +479,9 @@ if __name__ == "__main__":
     parser.add_argument('--port', type=int, default=6007)
     parser.add_argument('--debug_from', type=int, default=-100)
     parser.add_argument('--detect_anomaly', action='store_true', default=False)
-    parser.add_argument("--test_iterations", nargs="+", type=int, default=[7_000, 30_000])
-    parser.add_argument("--save_iterations", nargs="+", type=int, default=[7_000, 30_000])
+    parser.add_argument("--test_iterations", nargs="+", type=int, default=[2_000, 3_000, 4_000, 5_000, 6_000, 7_000, 8_000, 9_000, 10_000])
+    parser.add_argument("--save_iterations", nargs="+", type=int, default=[2_000, 3_000, 4_000, 5_000, 6_000, 7_000, 8_000, 9_000, 10_000])  
+    # parser.add_argument("--save_iterations", nargs="+", type=int, default=[1_000, 7_000, 10_000, 15_000, 20_000, 30_000])  # 后面这个改一下，多保存几张
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--checkpoint_iterations", nargs="+", type=int, default=[])
     parser.add_argument("--start_checkpoint", type=str, default = None)
