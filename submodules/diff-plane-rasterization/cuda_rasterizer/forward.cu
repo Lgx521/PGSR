@@ -423,7 +423,8 @@ void FORWARD::render(
 	uint32_t* n_contrib,
 	const float* bg_color,
 	float* out_color,
-	int* out_observe,
+	// int* out_observe,
+	float* out_alphas, //Modified for UQ, was above
 	float* out_all_map,
 	float* out_plane_depth,
 	const bool render_geo)
@@ -444,7 +445,8 @@ void FORWARD::render(
 		n_contrib,
 		bg_color,
 		out_color,
-		out_observe,
+		// out_observe,
+		out_alphas, //Modified for UQ, was above
 		out_all_map,
 		out_plane_depth,
 		render_geo);

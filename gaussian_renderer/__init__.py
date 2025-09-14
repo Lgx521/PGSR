@@ -149,6 +149,18 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         rotations = rotations,
         all_map = input_all_map,
         cov3D_precomp = cov3D_precomp)
+    
+        # +++ 在这里加入下面的调试代码 +++
+    import sys
+    print("\n--- DEBUGGING RASTERIZER OUTPUTS ---")
+    print(f"1. rendered_image:  type={type(rendered_image)}, shape={rendered_image.shape}")
+    print(f"2. radii:           type={type(radii)}, shape={radii.shape}")
+    print(f"3. out_observe:     type={type(out_observe)}, shape={out_observe.shape}")
+    print(f"4. out_all_map:     type={type(out_all_map)}, shape={out_all_map.shape}")
+    print(f"5. plane_depth:     type={type(plane_depth)}, shape={plane_depth.shape}")
+    print("--- END DEBUGGING ---")
+    sys.exit() # 程序将在这里安全退出
+    # +++ 调试代码结束 +++
 
     rendered_normal = out_all_map[0:3]
     rendered_alpha = out_all_map[3:4, ]
@@ -164,6 +176,8 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
                     "plane_depth": plane_depth,
                     "rendered_distance": rendered_distance
                     }
+    
+    return_dict["rasterizer_out"] = out_observe  # 添加以便于AIR-Embodied的uncertainty计算
     
     if app_model is not None and pc.use_app:
         appear_ab = app_model.appear_ab[torch.tensor(viewpoint_camera.uid).cuda()]

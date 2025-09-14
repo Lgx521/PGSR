@@ -21,7 +21,7 @@
 4.  **Run the script**: Execute the script from your terminal, pointing to your scene directory and the `transforms.json` file.
 
     ```bash
-    python scripts/preprocess/convert_with_tfs.py --data_path /home/sgan/PGSR/data/antique_gt_pose_10/scene --transforms_json /home/sgan/PGSR/data/antique_gt_pose_10/scene/transforms.json --resize
+    python scripts/preprocess/convert_with_tfs.py --data_path /home/sgan/PGSR/data/antique_gt_pose/scene_4 --transforms_json /home/sgan/PGSR/data/antique_gt_spose/scene_4/transforms.json --resize
     ```
 
       * Add the `--resize` flag if you want the downsampled `images_2`, `images_4`, and `images_8` folders.
@@ -33,5 +33,5 @@ After running, your scene directory will be populated with the `database.db` fil
 
 ### Training
 ```bash
-(pgsr) sgan@sgan-ubuntu:~/PGSR$ python train.py -s ./data/antique_gt_pose_10/scene -m .data/All_output/10_imgs --max_abs_split_points 0 --opacity_cull_threshold 0.05
+(pgsr) sgan@sgan-ubuntu:~/PGSR$ python train.py -s ./data/antique_gt_pose/scene_4 -m ./data/all_output/imgs_4 --max_abs_split_points 0 --opacity_cull_threshold 0.05
 ```

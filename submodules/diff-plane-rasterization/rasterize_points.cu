@@ -32,7 +32,7 @@ std::function<char*(size_t N)> resizeFunctional(torch::Tensor& t) {
     return lambda;
 }
 
-std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
+std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>  //Modified for UQ, was 8 pairs
 RasterizeGaussiansCUDA(
 	const torch::Tensor& background,
 	const torch::Tensor& means3D,
@@ -69,9 +69,13 @@ RasterizeGaussiansCUDA(
 
   torch::Tensor out_color = torch::full({NUM_CHANNELS, H, W}, 0.0, float_opts);
   torch::Tensor radii = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
-  torch::Tensor out_observe = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
+//   torch::Tensor out_observe = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
+  torch::Tensor out_observe = torch::full({P}, 0, float_opts); // 将 int_opts 改为 float_opts Modified for UQ, was above
   torch::Tensor out_all_map = torch::full({NUM_ALL_MAP, H, W}, 0, float_opts);
   torch::Tensor out_plane_depth = torch::full({1, H, W}, 0, float_opts);
+
+  //For uncertainty quantification(Was none)
+  torch::Tensor out_n_contrib = torch::zeros({H, W}, int_opts);
   
   torch::Device device(torch::kCUDA);
   torch::TensorOptions options(torch::kByte);
@@ -115,13 +119,17 @@ RasterizeGaussiansCUDA(
 		prefiltered,
 		out_color.contiguous().data<float>(),
 		radii.contiguous().data<int>(),
-		out_observe.contiguous().data<int>(),
+		// out_observe.contiguous().data<int>(),
+		out_observe.contiguous().data<float>(), // 将 data<int>() 改为 data<float>() Modified for UQ, was above
 		out_all_map.contiguous().data<float>(),
 		out_plane_depth.contiguous().data<float>(),
+
+		//For uncertainty quantification(was none)
+		out_n_contrib.contiguous().data<int>(),
 		render_geo,
 		debug);
   }
-  return std::make_tuple(rendered, out_color, radii, out_observe, out_all_map, out_plane_depth, geomBuffer, binningBuffer, imgBuffer);
+  return std::make_tuple(rendered, out_color, radii, out_observe, out_all_map, out_plane_depth, geomBuffer, binningBuffer, imgBuffer, out_n_contrib);  //For UQ, the last term was none
 }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
