@@ -347,7 +347,7 @@ int CudaRasterizer::Rasterizer::forward(
 		out_alphas, //For Uncertainty quantification(Was above)
 		out_all_map,
 		out_plane_depth,
-		render_geo), debug)
+		render_geo), debug);  //Modified for UQ, add semicolon(;)
 	
 	//For uncertainty quantification, was none
 	CHECK_CUDA(cudaMemcpy(out_n_contrib, imgState.n_contrib, width * height * sizeof(int), cudaMemcpyDeviceToDevice), debug);
