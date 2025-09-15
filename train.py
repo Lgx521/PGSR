@@ -361,8 +361,7 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             # Densification
             if iteration < opt.densify_until_iter:
                 # Keep track of max radii in image-space for pruning
-                out_observe, _ = render_pkg["rasterizer_out"]
-                mask = (out_observe > 0) & visibility_filter
+                mask = (render_pkg["out_observe"] > 0) & visibility_filter
                 gaussians.max_radii2D[mask] = torch.max(gaussians.max_radii2D[mask], radii[mask])
                 viewspace_point_tensor_abs = render_pkg["viewspace_points_abs"]
                 gaussians.add_densification_stats(viewspace_point_tensor, viewspace_point_tensor_abs, visibility_filter)
@@ -378,7 +377,7 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
                 observe_cnt = torch.zeros_like(gaussians.get_opacity)
                 for view in scene.getTrainCameras():
                     render_pkg_tmp = render(view, gaussians, pipe, bg, app_model=app_model, return_plane=False, return_depth_normal=False)
-                    out_observe, _ = render_pkg_tmp["rasterizer_out"]
+                    out_observe = render_pkg_tmp["out_observe"]
                     observe_cnt[out_observe > 0] += 1
                 prune_mask = (observe_cnt < observe_the).squeeze()
                 if prune_mask.sum() > 0:

@@ -122,7 +122,7 @@ namespace FORWARD
 		uint32_t* n_contrib,
 		const float* bg_color,
 		float* out_color,
-        float* out_alphas, 
+		float* out_alphas,
 		float* out_all_map,
 		float* out_plane_depth,
 		const bool render_geo);
