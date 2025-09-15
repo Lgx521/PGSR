@@ -33,5 +33,5 @@ After running, your scene directory will be populated with the `database.db` fil
 
 ### Training
 ```bash
-(pgsr) sgan@sgan-ubuntu:~/PGSR$ python train.py -s ./data/antique_gt_pose_10/scene -m .data/All_output/10_imgs --max_abs_split_points 0 --opacity_cull_threshold 0.05
+(pgsr) sgan@sgan-ubuntu:~/PGSR$ python train.py -s ./data/antique_gt_pose/scene_4 -m .data/all_output/imgs_4_test --max_abs_split_points 0 --opacity_cull_threshold 0.05
 ```

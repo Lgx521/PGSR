@@ -100,7 +100,6 @@ def analyze_scene(args):
     print(f"\n分析完成。所有热图已保存至 {output_dir}")
 
 if __name__ == "__main__":
-    # ... (这部分代码与之前完全相同) ...
     parser = ArgumentParser(description="为已训练的 PGSR 模型生成不确定性分析图。")
     lp = ModelParams(parser)
     pp = PipelineParams(parser)
