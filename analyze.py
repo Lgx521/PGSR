@@ -1,5 +1,3 @@
-# analyze.py (最终 GPU 加速版)
-
 import os
 import torch
 import numpy as np
