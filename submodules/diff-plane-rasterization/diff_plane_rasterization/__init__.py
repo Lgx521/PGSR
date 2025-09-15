@@ -30,6 +30,12 @@ def rasterize_gaussians(
     cov3Ds_precomp,
     all_map,
     raster_settings,
+    # 5Ls below is modified of uq
+    K,
+    per_pixel_count,
+    per_pixel_ids,
+    per_pixel_weights,
+    per_pixel_overflow,
 ):
     return _RasterizeGaussians.apply(
         means3D,
@@ -43,6 +49,12 @@ def rasterize_gaussians(
         cov3Ds_precomp,
         all_map,
         raster_settings,
+        # 5Ls below is modified of uq
+        K,
+        per_pixel_count,
+        per_pixel_ids,
+        per_pixel_weights,
+        per_pixel_overflow,
     )
 
 class _RasterizeGaussians(torch.autograd.Function):
@@ -60,6 +72,12 @@ class _RasterizeGaussians(torch.autograd.Function):
         cov3Ds_precomp,
         all_maps,
         raster_settings,
+        # 5Ls below is modified of uq
+        K,
+        per_pixel_count,
+        per_pixel_ids,
+        per_pixel_weights,
+        per_pixel_overflow,
     ):
 
         # Restructure arguments the way that the C++ lib expects them
@@ -84,7 +102,13 @@ class _RasterizeGaussians(torch.autograd.Function):
             raster_settings.campos,
             raster_settings.prefiltered,
             raster_settings.render_geo,
-            raster_settings.debug
+            raster_settings.debug,
+            # 5Ls below is modified of uq
+            K,
+            per_pixel_count,
+            per_pixel_ids,
+            per_pixel_weights,
+            per_pixel_overflow,
         )
 
         # Invoke C++/CUDA rasterizer
@@ -165,6 +189,12 @@ class _RasterizeGaussians(torch.autograd.Function):
             grad_rotations,
             grad_cov3Ds_precomp,
             gard_all_map,
+            None,
+            # 5L below is modified for uq
+            None,
+            None,
+            None,
+            None,
             None,
         )
 
