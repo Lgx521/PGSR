@@ -218,11 +218,9 @@ int CudaRasterizer::Rasterizer::forward(
 	const bool prefiltered,
 	float* out_color,
 	int* radii,
-	// int* out_observe,
-	float* out_alphas, //For Uncertainty quantification(Was above)
+	int* out_observe,
 	float* out_all_map,
 	float* out_plane_depth,
-	int* out_n_contrib,  //For uncertainty quantification(Was none)
 	const bool render_geo,
 	bool debug)
 {
@@ -343,14 +341,10 @@ int CudaRasterizer::Rasterizer::forward(
 		imgState.n_contrib,
 		background,
 		out_color,
-		// out_observe,
-		out_alphas, //For Uncertainty quantification(Was above)
+		out_observe,
 		out_all_map,
 		out_plane_depth,
 		render_geo), debug)
-	
-	//For uncertainty quantification, was none
-	CHECK_CUDA(cudaMemcpy(out_n_contrib, imgState.n_contrib, width * height * sizeof(int), cudaMemcpyDeviceToDevice), debug);
 
 	return num_rendered;
 }
