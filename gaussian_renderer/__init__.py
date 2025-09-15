@@ -104,8 +104,17 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
 
     rasterizer = PlaneGaussianRasterizer(raster_settings=raster_settings)
 
+    #6Ls is Modified for uq, was none
+    H, W = int(viewpoint_camera.image_height), int(viewpoint_camera.image_width)
+    npix = H * W
+    per_pixel_count = torch.zeros(npix, dtype=torch.int32, device="cuda")
+    per_pixel_ids = torch.zeros(npix * K, dtype=torch.int32, device="cuda")
+    per_pixel_weights = torch.zeros(npix * K, dtype=torch.float32, device="cuda")
+    per_pixel_overflow = torch.zeros(npix, dtype=torch.int32, device="cuda")
+
     if not return_plane:
-        rendered_image, radii, out_observe, _, _ = rasterizer(
+        # rendered_image, radii, out_observe, _, _ = rasterizer(
+        rendered_image, radii, out_observe, out_all_map, plane_depth = rasterizer(
             means3D = means3D,
             means2D = means2D,
             means2D_abs = means2D_abs,
@@ -114,7 +123,15 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
             opacities = opacity,
             scales = scales,
             rotations = rotations,
-            cov3D_precomp = cov3D_precomp)
+            cov3D_precomp = cov3D_precomp,
+
+            # 5Ls is modified for uq
+            K=K,
+            per_pixel_count=per_pixel_count,
+            per_pixel_ids=per_pixel_ids,
+            per_pixel_weights=per_pixel_weights,
+            per_pixel_overflow=per_pixel_overflow
+            )
         
         return_dict =  {"render": rendered_image,
                         "viewspace_points": screenspace_points,
@@ -126,6 +143,14 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
             appear_ab = app_model.appear_ab[torch.tensor(viewpoint_camera.uid).cuda()]
             app_image = torch.exp(appear_ab[0]) * rendered_image + appear_ab[1]
             return_dict.update({"app_image": app_image})
+
+        return_dict.update({
+            "per_pixel_count": per_pixel_count,
+            "per_pixel_ids": per_pixel_ids,
+            "per_pixel_weights": per_pixel_weights,
+            "per_pixel_overflow": per_pixel_overflow
+        })
+
         return return_dict
 
     global_normal = pc.get_normal(viewpoint_camera)

@@ -55,6 +55,13 @@ namespace CudaRasterizer
 			float* out_all_map,
 			float* out_plane_depth,
 			const bool render_geo,
+
+			//uq
+			const int K,
+            unsigned int* per_pixel_count,
+            unsigned int* per_pixel_ids,
+            float* per_pixel_weights,
+            unsigned int* per_pixel_overflow,
 			bool debug = false);
 
 		static void backward(
@@ -93,7 +100,8 @@ namespace CudaRasterizer
 			float* dL_drot,
 			float* dL_dall_map,
 			const bool render_geo,
-			bool debug);
+			bool debug
+		);
 	};
 };
 

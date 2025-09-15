@@ -68,7 +68,15 @@ namespace FORWARD
 		int* out_observe,
 		float* out_all_map,
 		float* out_plane_depth,
-		const bool render_geo);
+		const bool render_geo,
+
+		// 5 Lines below is modified for uq, was none
+		const int K,
+        unsigned int* per_pixel_count,
+        unsigned int* per_pixel_ids,
+        float* per_pixel_weights,
+        unsigned int* per_pixel_overflow
+	);
 }
 
 

@@ -201,7 +201,10 @@ class GaussianRasterizer(nn.Module):
             
         return visible
 
-    def forward(self, means3D, means2D, means2D_abs, opacities, shs = None, colors_precomp = None, scales = None, rotations = None, cov3D_precomp = None, all_map=None):
+    # def forward(self, means3D, means2D, means2D_abs, opacities, shs = None, colors_precomp = None, scales = None, rotations = None, cov3D_precomp = None, all_map=None):
+    def forward(self, means3D, means2D, means2D_abs, opacities, shs = None, colors_precomp = None, scales = None, rotations = None, cov3D_precomp = None, all_map=None, 
+                # +++ 确保这里有新增的参数 +++
+                K=0, per_pixel_count=None, per_pixel_ids=None, per_pixel_weights=None, per_pixel_overflow=None):
         
         raster_settings = self.raster_settings
 
@@ -238,5 +241,12 @@ class GaussianRasterizer(nn.Module):
             cov3D_precomp,
             all_map,
             raster_settings, 
+            # +++ 确保这里传递了新增的参数 +++
+            # uq
+            K,
+            per_pixel_count,
+            per_pixel_ids,
+            per_pixel_weights,
+            per_pixel_overflow,
         )
 

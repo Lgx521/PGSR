@@ -54,7 +54,16 @@ RasterizeGaussiansCUDA(
 	const torch::Tensor& campos,
 	const bool prefiltered,
 	const bool render_geo,
-	const bool debug)
+	//5Ls below is modified for uq, was none
+	const int K,
+    torch::Tensor& per_pixel_count,
+    torch::Tensor& per_pixel_ids,
+    torch::Tensor& per_pixel_weights,
+    torch::Tensor& per_pixel_overflow,
+	
+	const bool debug
+
+)
 {
   if (means3D.ndimension() != 2 || means3D.size(1) != 3) {
     AT_ERROR("means3D must have dimensions (num_points, 3)");
@@ -119,7 +128,16 @@ RasterizeGaussiansCUDA(
 		out_all_map.contiguous().data<float>(),
 		out_plane_depth.contiguous().data<float>(),
 		render_geo,
-		debug);
+		
+		//5Ls below is modified for uq, was none
+		K,
+        per_pixel_count.contiguous().data_ptr<unsigned int>(),
+        per_pixel_ids.contiguous().data_ptr<unsigned int>(),
+        per_pixel_weights.contiguous().data_ptr<float>(),
+        per_pixel_overflow.contiguous().data_ptr<unsigned int>(),
+
+		debug
+	);
   }
   return std::make_tuple(rendered, out_color, radii, out_observe, out_all_map, out_plane_depth, geomBuffer, binningBuffer, imgBuffer);
 }

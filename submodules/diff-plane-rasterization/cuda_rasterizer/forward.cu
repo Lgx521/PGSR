@@ -291,7 +291,15 @@ renderCUDA(
 	int* __restrict__ out_observe,
 	float* __restrict__ out_all_map,
 	float* __restrict__ out_plane_depth,
-	const bool render_geo)
+	const bool render_geo,
+
+	//5 Lines below is modified for uq, was none
+	const int K,
+    unsigned int* __restrict__ per_pixel_count,
+    unsigned int* __restrict__ per_pixel_ids,
+    float* __restrict__ per_pixel_weights,
+    unsigned int* __restrict__ per_pixel_overflow
+)
 {
 	// Identify current tile and associated min/max pixel range.
 	auto block = cg::this_thread_block();
@@ -363,6 +371,23 @@ renderCUDA(
 			float alpha = min(0.99f, con_o.w * exp(power));
 			if (alpha < 1.0f / 255.0f)
 				continue;
+
+			// Modified for uq, was none
+            // +++ 在这里插入方案A的核心逻辑 +++
+            unsigned int prim_id = collected_id[j];
+            float weight = alpha * T; // 使用 alpha * T 作为权重
+
+            unsigned int old_count = atomicAdd(&per_pixel_count[pix_id], 1u);
+            if (old_count < (unsigned int)K) {
+                int slot = pix_id * K + old_count;
+                per_pixel_ids[slot] = prim_id;
+                per_pixel_weights[slot] = weight;
+            } else {
+                per_pixel_overflow[pix_id] = 1u;
+            }
+            // +++ 插入结束 +++
+
+
 			float test_T = T * (1 - alpha);
 			if (test_T < 0.0001f)
 			{
@@ -426,7 +451,13 @@ void FORWARD::render(
 	int* out_observe,
 	float* out_all_map,
 	float* out_plane_depth,
-	const bool render_geo)
+	const bool render_geo,
+	//5 Lines below is modified for uq, was none
+	const int K,
+    unsigned int* per_pixel_count,
+    unsigned int* per_pixel_ids,
+    float* per_pixel_weights,
+    unsigned int* per_pixel_overflow)
 {
 	renderCUDA<NUM_CHANNELS,NUM_ALL_MAP> << <grid, block >> > (
 		ranges,
@@ -447,7 +478,15 @@ void FORWARD::render(
 		out_observe,
 		out_all_map,
 		out_plane_depth,
-		render_geo);
+		render_geo,
+		
+		//5 Lines below is modified for uq, was none
+		K,
+        per_pixel_count,
+        per_pixel_ids,
+        per_pixel_weights,
+        per_pixel_overflow
+	);
 }
 
 void FORWARD::preprocess(int P, int D, int M,

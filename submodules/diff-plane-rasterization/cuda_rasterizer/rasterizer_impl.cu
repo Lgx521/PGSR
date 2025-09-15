@@ -222,7 +222,15 @@ int CudaRasterizer::Rasterizer::forward(
 	float* out_all_map,
 	float* out_plane_depth,
 	const bool render_geo,
-	bool debug)
+	// Five lines below is modified for uq, was none
+	const int K,
+    unsigned int* per_pixel_count,
+    unsigned int* per_pixel_ids,
+    float* per_pixel_weights,
+    unsigned int* per_pixel_overflow,
+	bool debug
+)
+
 {
 	const float focal_y = height / (2.0f * tan_fovy);
 	const float focal_x = width / (2.0f * tan_fovx);
@@ -238,6 +246,10 @@ int CudaRasterizer::Rasterizer::forward(
 
 	dim3 tile_grid((width + BLOCK_X - 1) / BLOCK_X, (height + BLOCK_Y - 1) / BLOCK_Y, 1);
 	dim3 block(BLOCK_X, BLOCK_Y, 1);
+
+	//2 Lines below is modified for uq, was none
+	CHECK_CUDA(cudaMemset(per_pixel_count, 0, width * height * sizeof(unsigned int)), debug);
+    CHECK_CUDA(cudaMemset(per_pixel_overflow, 0, width * height * sizeof(unsigned int)), debug);
 
 	// Dynamically resize image-based auxiliary buffers during training
 	size_t img_chunk_size = required<ImageState>(width * height);
@@ -344,7 +356,15 @@ int CudaRasterizer::Rasterizer::forward(
 		out_observe,
 		out_all_map,
 		out_plane_depth,
-		render_geo), debug)
+		render_geo,
+
+		// 5L below is modified for uq, was none
+		K,
+        per_pixel_count,
+        per_pixel_ids,
+        per_pixel_weights,
+        per_pixel_overflow
+	), debug)
 
 	return num_rendered;
 }
