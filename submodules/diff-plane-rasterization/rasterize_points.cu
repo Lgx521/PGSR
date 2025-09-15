@@ -67,14 +67,22 @@ RasterizeGaussiansCUDA(
   auto int_opts = means3D.options().dtype(torch::kInt32);
   auto float_opts = means3D.options().dtype(torch::kFloat32);
 
+//   torch::Tensor out_color = torch::full({NUM_CHANNELS, H, W}, 0.0, float_opts);
+//   torch::Tensor radii = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
+// //   torch::Tensor out_observe = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
+//   torch::Tensor out_observe = torch::full({P}, 0, float_opts); // 将 int_opts 改为 float_opts Modified for UQ, was above
+//   torch::Tensor out_all_map = torch::full({NUM_ALL_MAP, H, W}, 0, float_opts);
+//   torch::Tensor out_plane_depth = torch::full({1, H, W}, 0, float_opts);
+
+//   //For uncertainty quantification(Was none)
+//   torch::Tensor out_n_contrib = torch::zeros({H, W}, int_opts);
+
+  //6 lines below was above
   torch::Tensor out_color = torch::full({NUM_CHANNELS, H, W}, 0.0, float_opts);
-  torch::Tensor radii = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
-//   torch::Tensor out_observe = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
-  torch::Tensor out_observe = torch::full({P}, 0, float_opts); // 将 int_opts 改为 float_opts Modified for UQ, was above
+  torch::Tensor radii = torch::full({P}, 0, int_opts);
+  torch::Tensor out_observe = torch::zeros({P}, float_opts);
   torch::Tensor out_all_map = torch::full({NUM_ALL_MAP, H, W}, 0, float_opts);
   torch::Tensor out_plane_depth = torch::full({1, H, W}, 0, float_opts);
-
-  //For uncertainty quantification(Was none)
   torch::Tensor out_n_contrib = torch::zeros({H, W}, int_opts);
   
   torch::Device device(torch::kCUDA);
