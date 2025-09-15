@@ -52,7 +52,7 @@ namespace CudaRasterizer
 			float* out_color,
 			int* radii,
 			// int* out_observe,
-			float* out_alphas,  //For uncertainty quantification(Was Above)
+			float* out_observe,  //For uncertainty quantification(Was Above)
 			float* out_all_map,
 			float* out_plane_depth,
 			int* out_n_contrib,   //For uncertainty quantification(Was None)

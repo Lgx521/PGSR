@@ -72,6 +72,8 @@
 // 		const bool render_geo);
 // }
 
+// 在 forward.h 中
+
 namespace FORWARD
 {
 	// Bounding box of a Gaussian

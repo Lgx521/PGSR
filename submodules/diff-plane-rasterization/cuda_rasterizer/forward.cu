@@ -288,8 +288,7 @@ renderCUDA(
 	uint32_t* __restrict__ n_contrib,
 	const float* __restrict__ bg_color,
 	float* __restrict__ out_color,
-	// int* __restrict__ out_observe,
-	float* __restrict__ out_alphas,  //Modified for UQ, was above
+	int* __restrict__ out_observe,
 	float* __restrict__ out_all_map,
 	float* __restrict__ out_plane_depth,
 	const bool render_geo)
@@ -379,10 +378,10 @@ renderCUDA(
 					All_map[ch] += all_map[collected_id[j] * ALL_MAP + ch] * alpha * T;
 			}
 			
-			// if (T > 0.5)
-			// {
-				// atomicAdd(&(out_observe[collected_id[j]]), 1);  //4 lines Modified for UQ, was not commented.
-			// }
+			if (T > 0.5)
+			{
+				atomicAdd(&(out_observe[collected_id[j]]), 1);
+			}
 			T = test_T;
 
 			// Keep track of last range entry to update this
