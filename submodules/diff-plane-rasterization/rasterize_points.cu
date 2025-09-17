@@ -55,15 +55,16 @@ RasterizeGaussiansCUDA(
 	const bool prefiltered,
 	const bool render_geo,
 	const bool debug,
+	const torch::Tensor& depths, //depth
 	//5Ls below is modified for uq, was none
 	const int K,
     torch::Tensor& per_pixel_count,
     torch::Tensor& per_pixel_ids,
     torch::Tensor& per_pixel_weights,
-    torch::Tensor& per_pixel_overflow
-	
-	
+    torch::Tensor& per_pixel_overflow,
 
+	torch::Tensor& per_pixel_depths //depth
+	
 )
 {
   if (means3D.ndimension() != 2 || means3D.size(1) != 3) {
@@ -117,6 +118,7 @@ RasterizeGaussiansCUDA(
 		rotations.contiguous().data_ptr<float>(),
 		cov3D_precomp.contiguous().data<float>(), 
 		all_map.contiguous().data<float>(), 
+		depths.contiguous().data<float>(), //depths
 		viewmatrix.contiguous().data<float>(), 
 		projmatrix.contiguous().data<float>(),
 		campos.contiguous().data<float>(),
@@ -136,6 +138,8 @@ RasterizeGaussiansCUDA(
         per_pixel_ids.contiguous().data_ptr<unsigned int>(),
         per_pixel_weights.contiguous().data_ptr<float>(),
         per_pixel_overflow.contiguous().data_ptr<unsigned int>(),
+
+		per_pixel_depths.contiguous().data_ptr<float>(), //depth
 
 		debug
 	);

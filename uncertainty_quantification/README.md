@@ -61,7 +61,7 @@ python analyze.py -m <model_path> -s <source_path> [可选参数]
 ### 命令
 
 ```bash
-python uncertainty_quantification/analyze.py -m ./data/all_output/imgs_4_test -s ./data/antique_gt_pose/scene_4
+python analyze.py -m ./data/all_output/imgs_4_test -s ./data/antique_gt_pose/scene_4
 ```
 
 ### 命令解析
@@ -94,3 +94,14 @@ python uncertainty_quantification/analyze.py -m ./data/all_output/imgs_4_test -s
 
   * **内存消耗**: 此脚本（尤其是在渲染过程中创建的缓冲区）可能会占用大量的 GPU 显存。如果遇到显存不足的错误，可以考虑减小 `K_BUCKET_SIZE` 的值（需同步修改C++代码并重新编译）。
   * **像素溢出**: 如果在运行时看到关于“像素溢出”的警告，这意味着在某些像素上，有超过 `K_BUCKET_SIZE` 个高斯点对其有贡献。少量溢出通常不影响整体分析，但如果溢出率过高，则得到的热图可能不完全准确。
+
+  # Rasterization ray gaussian primitives distribution analyze
+
+  The command is like follows
+  ```bash
+    python analyze.py -s /path/to/your/dataset -m /path/to/your/output_model --visualize_uid 3 --visualize_px 400 350
+  ```
+  E.g.
+  ```bash
+    python analyze.py -m ./data/all_output/imgs_4_test -s ./data/antique_gt_pose/scene_4 --visualize_uid 3 --visualize_px 400 400
+  ```

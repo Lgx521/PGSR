@@ -36,6 +36,7 @@ def rasterize_gaussians(
     per_pixel_ids,
     per_pixel_weights,
     per_pixel_overflow,
+    per_pixel_depths,
 ):
     return _RasterizeGaussians.apply(
         means3D,
@@ -55,6 +56,7 @@ def rasterize_gaussians(
         per_pixel_ids,
         per_pixel_weights,
         per_pixel_overflow,
+        per_pixel_depths,
     )
 
 class _RasterizeGaussians(torch.autograd.Function):
@@ -78,6 +80,7 @@ class _RasterizeGaussians(torch.autograd.Function):
         per_pixel_ids,
         per_pixel_weights,
         per_pixel_overflow,
+        per_pixel_depths,
     ):
 
         # Restructure arguments the way that the C++ lib expects them
@@ -91,6 +94,7 @@ class _RasterizeGaussians(torch.autograd.Function):
             raster_settings.scale_modifier,
             cov3Ds_precomp,
             all_maps,
+            raster_settings.depths,
             raster_settings.viewmatrix,
             raster_settings.projmatrix,
             raster_settings.tanfovx,
@@ -109,18 +113,44 @@ class _RasterizeGaussians(torch.autograd.Function):
             per_pixel_ids,
             per_pixel_weights,
             per_pixel_overflow,
+            per_pixel_depths,
         )
 
         # Invoke C++/CUDA rasterizer
         if raster_settings.debug:
             cpu_args = cpu_deep_copy_tuple(args) # Copy them before they can be corrupted
             try:
+                ### TEST
+                print("="*40)
+                print("DEBUGGING ARGUMENTS PASSED TO C++ rasterize_gaussians")
+                print(f"Total number of arguments: {len(args)}")
+                print("-"*40)
+                for i, arg in enumerate(args):
+                    if hasattr(arg, 'shape'): # 检查是否是Tensor
+                        print(f"Arg [{i:02d}]: Type = {type(arg)}, Shape = {arg.shape}, Dtype = {arg.dtype}")
+                    else:
+                        print(f"Arg [{i:02d}]: Type = {type(arg)}, Value = {arg}")
+                print("="*40)
+                ### TEST
+
                 num_rendered, color, radii, out_observe, out_all_map, geomBuffer, binningBuffer, imgBuffer = _C.rasterize_gaussians(*args)
             except Exception as ex:
                 torch.save(cpu_args, "snapshot_fw.dump")
                 print("\nAn error occured in forward. Please forward snapshot_fw.dump for debugging.")
                 raise ex
         else:
+             ### TEST
+            print("="*40)
+            print("DEBUGGING ARGUMENTS PASSED TO C++ rasterize_gaussians")
+            print(f"Total number of arguments: {len(args)}")
+            print("-"*40)
+            for i, arg in enumerate(args):
+                if hasattr(arg, 'shape'): # 检查是否是Tensor
+                    print(f"Arg [{i:02d}]: Type = {type(arg)}, Shape = {arg.shape}, Dtype = {arg.dtype}")
+                else:
+                    print(f"Arg [{i:02d}]: Type = {type(arg)}, Value = {arg}")
+            print("="*40)
+            ### TEST
             num_rendered, color, radii, out_observe, out_all_map, out_plane_depth, geomBuffer, binningBuffer, imgBuffer = _C.rasterize_gaussians(*args)
 
         # Keep relevant tensors for backward
@@ -196,6 +226,7 @@ class _RasterizeGaussians(torch.autograd.Function):
             None,
             None,
             None,
+            None, # depth
         )
 
         return grads
@@ -207,6 +238,7 @@ class GaussianRasterizationSettings(NamedTuple):
     tanfovy : float
     bg : torch.Tensor
     scale_modifier : float
+    depths: torch.Tensor
     viewmatrix : torch.Tensor
     projmatrix : torch.Tensor
     sh_degree : int
@@ -234,7 +266,7 @@ class GaussianRasterizer(nn.Module):
     # def forward(self, means3D, means2D, means2D_abs, opacities, shs = None, colors_precomp = None, scales = None, rotations = None, cov3D_precomp = None, all_map=None):
     def forward(self, means3D, means2D, means2D_abs, opacities, shs = None, colors_precomp = None, scales = None, rotations = None, cov3D_precomp = None, all_map=None, 
                 # +++ 确保这里有新增的参数 +++
-                K=0, per_pixel_count=None, per_pixel_ids=None, per_pixel_weights=None, per_pixel_overflow=None):
+                K=0, per_pixel_count=None, per_pixel_ids=None, per_pixel_weights=None, per_pixel_overflow=None, per_pixel_depths=None):
         
         raster_settings = self.raster_settings
 
@@ -278,5 +310,6 @@ class GaussianRasterizer(nn.Module):
             per_pixel_ids,
             per_pixel_weights,
             per_pixel_overflow,
+            per_pixel_depths, 
         )
 

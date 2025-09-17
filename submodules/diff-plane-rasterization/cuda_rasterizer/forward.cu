@@ -279,6 +279,7 @@ renderCUDA(
 	const float focal_x, const float focal_y,
 	const float cx, const float cy,
 	const float* __restrict__ viewmatrix,
+	const float* __restrict__ depths, //Modified for depth
 	const float* __restrict__ cam_pos,
 	const float2* __restrict__ points_xy_image,
 	const float* __restrict__ features,
@@ -298,7 +299,8 @@ renderCUDA(
     unsigned int* __restrict__ per_pixel_count,
     unsigned int* __restrict__ per_pixel_ids,
     float* __restrict__ per_pixel_weights,
-    unsigned int* __restrict__ per_pixel_overflow
+    unsigned int* __restrict__ per_pixel_overflow,
+	float* __restrict__ per_pixel_depths //Modified for depth
 )
 {
 	// Identify current tile and associated min/max pixel range.
@@ -382,6 +384,7 @@ renderCUDA(
                 int slot = pix_id * K + old_count;
                 per_pixel_ids[slot] = prim_id;
                 per_pixel_weights[slot] = weight;
+				per_pixel_depths[slot] = depths[prim_id];
             } else {
                 per_pixel_overflow[pix_id] = 1u;
             }
@@ -439,6 +442,7 @@ void FORWARD::render(
 	const float focal_x, const float focal_y,
 	const float cx, const float cy,
 	const float* viewmatrix,
+	const float* depths, //Modified for depth
 	const float* cam_pos,
 	const float2* means2D,
 	const float* colors,
@@ -457,7 +461,8 @@ void FORWARD::render(
     unsigned int* per_pixel_count,
     unsigned int* per_pixel_ids,
     float* per_pixel_weights,
-    unsigned int* per_pixel_overflow)
+    unsigned int* per_pixel_overflow,
+	float* per_pixel_depths)
 {
 	renderCUDA<NUM_CHANNELS,NUM_ALL_MAP> << <grid, block >> > (
 		ranges,
@@ -466,6 +471,7 @@ void FORWARD::render(
 		focal_x, focal_y,
 		cx, cy,
 		viewmatrix,
+		depths, //Modified for depth
 		cam_pos,
 		means2D,
 		colors,
@@ -485,7 +491,8 @@ void FORWARD::render(
         per_pixel_count,
         per_pixel_ids,
         per_pixel_weights,
-        per_pixel_overflow
+        per_pixel_overflow,
+		per_pixel_depths //Modified for depth
 	);
 }
 
