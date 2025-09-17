@@ -38,14 +38,12 @@ RasterizeGaussiansCUDA(
 	const bool prefiltered,
 	const bool render_geo,
 	const bool debug,
-	const torch::Tensor& depths, //depth
 	//5Ls below is modified for uq, was none
 	const int K,
     torch::Tensor& per_pixel_count,
     torch::Tensor& per_pixel_ids,
     torch::Tensor& per_pixel_weights,
-    torch::Tensor& per_pixel_overflow,
-	torch::Tensor& per_pixel_depths //depth
+    torch::Tensor& per_pixel_overflow
 );
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>

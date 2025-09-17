@@ -56,7 +56,6 @@ namespace FORWARD
 		const float focal_x, const float focal_y,
 		const float cx, const float cy,
 		const float* viewmatrix,
-		const float* depths, //Modified for depth
 		const float* cam_pos,
 		const float2* points_xy_image,
 		const float* features,
@@ -76,8 +75,7 @@ namespace FORWARD
         unsigned int* per_pixel_count,
         unsigned int* per_pixel_ids,
         float* per_pixel_weights,
-        unsigned int* per_pixel_overflow,
-		float* per_pixel_depths
+        unsigned int* per_pixel_overflow
 	);
 }
 

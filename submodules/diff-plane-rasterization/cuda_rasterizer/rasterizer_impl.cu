@@ -211,7 +211,6 @@ int CudaRasterizer::Rasterizer::forward(
 	const float* rotations,
 	const float* cov3D_precomp,
 	const float* all_map,
-	const float* depths, //depth
 	const float* viewmatrix,
 	const float* projmatrix,
 	const float* cam_pos,
@@ -229,9 +228,6 @@ int CudaRasterizer::Rasterizer::forward(
     unsigned int* per_pixel_ids,
     float* per_pixel_weights,
     unsigned int* per_pixel_overflow,
-
-	float* per_pixel_depths, //depth
-
 	bool debug
 )
 
@@ -348,7 +344,6 @@ int CudaRasterizer::Rasterizer::forward(
 		focal_x, focal_y,
 		float(width*0.5f), float(height*0.5f),
 		viewmatrix,
-		depths,
 		cam_pos,
 		geomState.means2D,
 		feature_ptr,
@@ -368,9 +363,7 @@ int CudaRasterizer::Rasterizer::forward(
         per_pixel_count,
         per_pixel_ids,
         per_pixel_weights,
-        per_pixel_overflow,
-
-		per_pixel_depths //depth
+        per_pixel_overflow
 	), debug)
 
 	return num_rendered;

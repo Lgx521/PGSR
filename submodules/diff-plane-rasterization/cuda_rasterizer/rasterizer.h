@@ -44,7 +44,6 @@ namespace CudaRasterizer
 			const float* rotations,
 			const float* cov3D_precomp,
 			const float* all_map,
-			const float* depths,  //depth
 			const float* viewmatrix,
 			const float* projmatrix,
 			const float* cam_pos,
@@ -63,9 +62,6 @@ namespace CudaRasterizer
             unsigned int* per_pixel_ids,
             float* per_pixel_weights,
             unsigned int* per_pixel_overflow,
-
-			float* per_pixel_depths, //depth
-
 			bool debug = false);
 
 		static void backward(

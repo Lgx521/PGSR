@@ -53,11 +53,6 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
     tanfovx = math.tan(viewpoint_camera.FoVx * 0.5)
     tanfovy = math.tan(viewpoint_camera.FoVy * 0.5)
 
-    # 獲取高斯點的數量
-    num_points = pc.get_xyz.shape[0]
-    # 創建一個空的 depths 張量作為緩衝區
-    depths = torch.empty(num_points, 1, device="cuda", dtype=torch.float32)
-
     raster_settings = PlaneGaussianRasterizationSettings(
             image_height=int(viewpoint_camera.image_height),
             image_width=int(viewpoint_camera.image_width),
@@ -65,15 +60,13 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
             tanfovy=tanfovy,
             bg=bg_color,
             scale_modifier=scaling_modifier,
-            depths=depths,
             viewmatrix=viewpoint_camera.world_view_transform,
             projmatrix=viewpoint_camera.full_proj_transform,
             sh_degree=pc.active_sh_degree,
             campos=viewpoint_camera.camera_center,
             prefiltered=False,
             render_geo=return_plane,
-            debug=pipe.debug,
-            
+            debug=pipe.debug
         )
 
     rasterizer = PlaneGaussianRasterizer(raster_settings=raster_settings)
@@ -86,8 +79,6 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
     per_pixel_ids = torch.zeros(npix * K, dtype=torch.uint32, device="cuda")
     per_pixel_weights = torch.zeros(npix * K, dtype=torch.float32, device="cuda")
     per_pixel_overflow = torch.zeros(npix, dtype=torch.uint32, device="cuda")
-    per_pixel_depths = torch.zeros(npix * K, dtype=torch.float32, device="cuda")  # depth
-
 
     means3D = pc.get_xyz
     means2D = screenspace_points
@@ -144,7 +135,6 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         per_pixel_count=per_pixel_count,
         per_pixel_ids=per_pixel_ids,
         per_pixel_weights=per_pixel_weights,
-        per_pixel_depths=per_pixel_depths,  # depth
         per_pixel_overflow=per_pixel_overflow
     )
     
@@ -179,7 +169,6 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         "per_pixel_count": per_pixel_count,
         "per_pixel_ids": per_pixel_ids,
         "per_pixel_weights": per_pixel_weights,
-        "per_pixel_depths": per_pixel_depths,  # depth
         "per_pixel_overflow": per_pixel_overflow
     })
 
