@@ -100,5 +100,5 @@ python analyze.py -m ./data/all_output/imgs_4_test -s ./data/antique_gt_pose/sce
   # 特定像素深度渲染可视化
 
   ```bash
-  python analyze.py -m ./data/all_output/imgs_4_test -s ./data/antique_gt_pose/scene_4 --visualize_uid 0 --visualize_px 400 400
+  python depth_distro.py -m ./data/all_output/imgs_4_test -s ./data/antique_gt_pose/scene_4 --visualize_uid 0 --visualize_px 400 400
   ```
