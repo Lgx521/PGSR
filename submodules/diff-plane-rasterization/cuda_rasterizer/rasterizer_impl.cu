@@ -228,6 +228,7 @@ int CudaRasterizer::Rasterizer::forward(
     unsigned int* per_pixel_ids,
     float* per_pixel_weights,
     unsigned int* per_pixel_overflow,
+	float* per_pixel_depths, //depth
 	bool debug
 )
 
@@ -348,6 +349,7 @@ int CudaRasterizer::Rasterizer::forward(
 		geomState.means2D,
 		feature_ptr,
 		all_map,
+		geomState.depths, //depth
 		geomState.conic_opacity,
 		imgState.accum_alpha,
 		imgState.n_contrib,
@@ -363,7 +365,8 @@ int CudaRasterizer::Rasterizer::forward(
         per_pixel_count,
         per_pixel_ids,
         per_pixel_weights,
-        per_pixel_overflow
+        per_pixel_overflow,
+		per_pixel_depths
 	), debug)
 
 	return num_rendered;

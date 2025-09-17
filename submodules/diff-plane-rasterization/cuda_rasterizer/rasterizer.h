@@ -62,6 +62,7 @@ namespace CudaRasterizer
             unsigned int* per_pixel_ids,
             float* per_pixel_weights,
             unsigned int* per_pixel_overflow,
+			float* per_pixel_depths, //depth
 			bool debug = false);
 
 		static void backward(

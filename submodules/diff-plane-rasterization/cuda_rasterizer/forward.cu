@@ -283,6 +283,7 @@ renderCUDA(
 	const float2* __restrict__ points_xy_image,
 	const float* __restrict__ features,
 	const float* __restrict__ all_map,
+	const float* __restrict__ depths,  //depth
 	const float4* __restrict__ conic_opacity,
 	float* __restrict__ final_T,
 	uint32_t* __restrict__ n_contrib,
@@ -298,7 +299,9 @@ renderCUDA(
     unsigned int* __restrict__ per_pixel_count,
     unsigned int* __restrict__ per_pixel_ids,
     float* __restrict__ per_pixel_weights,
-    unsigned int* __restrict__ per_pixel_overflow
+    unsigned int* __restrict__ per_pixel_overflow,
+
+	float* __restrict__ per_pixel_depths //depth
 )
 {
 	// Identify current tile and associated min/max pixel range.
@@ -324,6 +327,7 @@ renderCUDA(
 	__shared__ int collected_id[BLOCK_SIZE];
 	__shared__ float2 collected_xy[BLOCK_SIZE];
 	__shared__ float4 collected_conic_opacity[BLOCK_SIZE];
+	__shared__ float collected_depths[BLOCK_SIZE]; //depth
 
 	// Initialize helper variables
 	float T = 1.0f;
@@ -347,6 +351,7 @@ renderCUDA(
 			collected_id[block.thread_rank()] = coll_id;
 			collected_xy[block.thread_rank()] = points_xy_image[coll_id];
 			collected_conic_opacity[block.thread_rank()] = conic_opacity[coll_id];
+			collected_depths[block.thread_rank()] = depths[coll_id]; //depth
 		}
 		block.sync();
 
@@ -377,11 +382,16 @@ renderCUDA(
             unsigned int prim_id = collected_id[j];
             float weight = alpha * T; // 使用 alpha * T 作为权重
 
+			//depth
+			// +++ 获取当前高斯基元的深度值 +++
+            float depth_val = collected_depths[j];
+
             unsigned int old_count = atomicAdd(&per_pixel_count[pix_id], 1u);
             if (old_count < (unsigned int)K) {
                 int slot = pix_id * K + old_count;
                 per_pixel_ids[slot] = prim_id;
                 per_pixel_weights[slot] = weight;
+				per_pixel_depths[slot] = depth_val; //depth
             } else {
                 per_pixel_overflow[pix_id] = 1u;
             }
@@ -443,6 +453,7 @@ void FORWARD::render(
 	const float2* means2D,
 	const float* colors,
 	const float* all_map,
+	const float* depths,
 	const float4* conic_opacity,
 	float* final_T,
 	uint32_t* n_contrib,
@@ -457,7 +468,8 @@ void FORWARD::render(
     unsigned int* per_pixel_count,
     unsigned int* per_pixel_ids,
     float* per_pixel_weights,
-    unsigned int* per_pixel_overflow)
+    unsigned int* per_pixel_overflow,
+	float* per_pixel_depths)
 {
 	renderCUDA<NUM_CHANNELS,NUM_ALL_MAP> << <grid, block >> > (
 		ranges,
@@ -470,6 +482,7 @@ void FORWARD::render(
 		means2D,
 		colors,
 		all_map,
+		depths,
 		conic_opacity,
 		final_T,
 		n_contrib,
@@ -485,7 +498,8 @@ void FORWARD::render(
         per_pixel_count,
         per_pixel_ids,
         per_pixel_weights,
-        per_pixel_overflow
+        per_pixel_overflow,
+		per_pixel_depths
 	);
 }
 

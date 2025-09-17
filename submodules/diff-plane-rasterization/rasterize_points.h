@@ -43,7 +43,8 @@ RasterizeGaussiansCUDA(
     torch::Tensor& per_pixel_count,
     torch::Tensor& per_pixel_ids,
     torch::Tensor& per_pixel_weights,
-    torch::Tensor& per_pixel_overflow
+    torch::Tensor& per_pixel_overflow,
+	torch::Tensor& per_pixel_depths //depth
 );
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>

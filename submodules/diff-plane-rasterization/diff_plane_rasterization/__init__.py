@@ -36,6 +36,7 @@ def rasterize_gaussians(
     per_pixel_ids,
     per_pixel_weights,
     per_pixel_overflow,
+    per_pixel_depths, # depth
 ):
     return _RasterizeGaussians.apply(
         means3D,
@@ -55,6 +56,7 @@ def rasterize_gaussians(
         per_pixel_ids,
         per_pixel_weights,
         per_pixel_overflow,
+        per_pixel_depths, # depth
     )
 
 class _RasterizeGaussians(torch.autograd.Function):
@@ -78,6 +80,7 @@ class _RasterizeGaussians(torch.autograd.Function):
         per_pixel_ids,
         per_pixel_weights,
         per_pixel_overflow,
+        per_pixel_depths, # depth
     ):
 
         # Restructure arguments the way that the C++ lib expects them
@@ -109,6 +112,7 @@ class _RasterizeGaussians(torch.autograd.Function):
             per_pixel_ids,
             per_pixel_weights,
             per_pixel_overflow,
+            per_pixel_depths, # depth
         )
 
         # Invoke C++/CUDA rasterizer
@@ -196,6 +200,8 @@ class _RasterizeGaussians(torch.autograd.Function):
             None,
             None,
             None,
+
+            None, # for depth
         )
 
         return grads
@@ -234,7 +240,7 @@ class GaussianRasterizer(nn.Module):
     # def forward(self, means3D, means2D, means2D_abs, opacities, shs = None, colors_precomp = None, scales = None, rotations = None, cov3D_precomp = None, all_map=None):
     def forward(self, means3D, means2D, means2D_abs, opacities, shs = None, colors_precomp = None, scales = None, rotations = None, cov3D_precomp = None, all_map=None, 
                 # +++ 确保这里有新增的参数 +++
-                K=0, per_pixel_count=None, per_pixel_ids=None, per_pixel_weights=None, per_pixel_overflow=None):
+                K=0, per_pixel_count=None, per_pixel_ids=None, per_pixel_weights=None, per_pixel_overflow=None, per_pixel_depths=None):
         
         raster_settings = self.raster_settings
 
@@ -278,5 +284,6 @@ class GaussianRasterizer(nn.Module):
             per_pixel_ids,
             per_pixel_weights,
             per_pixel_overflow,
+            per_pixel_depths, # depth
         )
 

@@ -60,6 +60,7 @@ namespace FORWARD
 		const float2* points_xy_image,
 		const float* features,
 		const float* all_map,
+		const float* depths, //depths
 		const float4* conic_opacity,
 		float* final_T,
 		uint32_t* n_contrib,
@@ -75,7 +76,9 @@ namespace FORWARD
         unsigned int* per_pixel_count,
         unsigned int* per_pixel_ids,
         float* per_pixel_weights,
-        unsigned int* per_pixel_overflow
+        unsigned int* per_pixel_overflow,
+
+		float* per_pixel_depths //depth
 	);
 }
 

@@ -60,9 +60,9 @@ RasterizeGaussiansCUDA(
     torch::Tensor& per_pixel_count,
     torch::Tensor& per_pixel_ids,
     torch::Tensor& per_pixel_weights,
-    torch::Tensor& per_pixel_overflow
-	
-	
+    torch::Tensor& per_pixel_overflow,
+
+	torch::Tensor& per_pixel_depths //depth
 
 )
 {
@@ -136,6 +136,8 @@ RasterizeGaussiansCUDA(
         per_pixel_ids.contiguous().data_ptr<unsigned int>(),
         per_pixel_weights.contiguous().data_ptr<float>(),
         per_pixel_overflow.contiguous().data_ptr<unsigned int>(),
+
+		per_pixel_depths.contiguous().data_ptr<float>(), //depth
 
 		debug
 	);

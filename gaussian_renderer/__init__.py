@@ -79,6 +79,7 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
     per_pixel_ids = torch.zeros(npix * K, dtype=torch.uint32, device="cuda")
     per_pixel_weights = torch.zeros(npix * K, dtype=torch.float32, device="cuda")
     per_pixel_overflow = torch.zeros(npix, dtype=torch.uint32, device="cuda")
+    per_pixel_depths = torch.zeros(npix * K, dtype=torch.float32, device="cuda") # depth
 
     means3D = pc.get_xyz
     means2D = screenspace_points
@@ -135,7 +136,8 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         per_pixel_count=per_pixel_count,
         per_pixel_ids=per_pixel_ids,
         per_pixel_weights=per_pixel_weights,
-        per_pixel_overflow=per_pixel_overflow
+        per_pixel_overflow=per_pixel_overflow,
+        per_pixel_depths=per_pixel_depths # depth
     )
     
     return_dict = {}
@@ -169,7 +171,8 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
         "per_pixel_count": per_pixel_count,
         "per_pixel_ids": per_pixel_ids,
         "per_pixel_weights": per_pixel_weights,
-        "per_pixel_overflow": per_pixel_overflow
+        "per_pixel_overflow": per_pixel_overflow,
+        "per_pixel_depths": per_pixel_depths # depth
     })
 
     if app_model is not None and pc.use_app:
